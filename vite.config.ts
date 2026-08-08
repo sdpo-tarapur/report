@@ -4,10 +4,10 @@ import path from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
-  // Extract repo name if available in GitHub Actions, or hardcode your exact repo name
+  // Configured for GitHub Pages deployment under the 'report' repository
   const repoName = process.env.GITHUB_REPOSITORY
     ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/`
-    : '/sdpo-tarapur-police-subdivision-portal/'; // <--- Replace with your EXACT GitHub repository name
+    : '/report/';
 
   return {
     base: repoName,
@@ -18,6 +18,7 @@ export default defineConfig(() => {
       },
     },
     server: {
+      // HMR is disabled in AI Studio via DISABLE_HMR env var.
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
