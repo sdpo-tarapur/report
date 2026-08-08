@@ -74,21 +74,25 @@ export default function App() {
 
   // User Accounts & Security State
   const [userAccounts, setUserAccounts] = useState<UserAccount[]>(() => {
-    const saved = localStorage.getItem('sdpo_user_accounts');
-    return saved ? JSON.parse(saved) : INITIAL_USER_ACCOUNTS;
+    try {
+      const saved = localStorage.getItem('sdpo_user_accounts');
+      return saved ? JSON.parse(saved) : INITIAL_USER_ACCOUNTS;
+    } catch {
+      return INITIAL_USER_ACCOUNTS;
+    }
   });
 
   const [currentUserAccount, setCurrentUserAccount] = useState<UserAccount | null>(() => {
-    const saved = localStorage.getItem('sdpo_current_user_account');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('sdpo_current_user_account');
+      if (saved) {
         return JSON.parse(saved);
-      } catch {
-        return null;
       }
+    } catch {
+      // fallback below
     }
     // Default to initial SDPO account logged in on first launch
-    return INITIAL_USER_ACCOUNTS[0];
+    return INITIAL_USER_ACCOUNTS[0] || null;
   });
 
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
@@ -96,35 +100,59 @@ export default function App() {
   // Persistent State
   const [currentRole, setCurrentRole] = useState<UserRole>(() => {
     if (currentUserAccount) return currentUserAccount.role;
-    const saved = localStorage.getItem('sdpo_current_role');
-    return (saved as UserRole) || 'SDPO';
+    try {
+      const saved = localStorage.getItem('sdpo_current_role');
+      return (saved as UserRole) || 'SDPO';
+    } catch {
+      return 'SDPO';
+    }
   });
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const [cases, setCases] = useState<FIRCase[]>(() => {
-    const saved = localStorage.getItem('sdpo_firs');
-    return saved ? JSON.parse(saved) : INITIAL_FIRS;
+    try {
+      const saved = localStorage.getItem('sdpo_firs');
+      return saved ? JSON.parse(saved) : INITIAL_FIRS;
+    } catch {
+      return INITIAL_FIRS;
+    }
   });
 
   const [landDisputes, setLandDisputes] = useState<LandDispute[]>(() => {
-    const saved = localStorage.getItem('sdpo_land_disputes');
-    return saved ? JSON.parse(saved) : INITIAL_LAND_DISPUTES;
+    try {
+      const saved = localStorage.getItem('sdpo_land_disputes');
+      return saved ? JSON.parse(saved) : INITIAL_LAND_DISPUTES;
+    } catch {
+      return INITIAL_LAND_DISPUTES;
+    }
   });
 
   const [udCases, setUdCases] = useState<UDCase[]>(() => {
-    const saved = localStorage.getItem('sdpo_ud_cases');
-    return saved ? JSON.parse(saved) : INITIAL_UD_CASES;
+    try {
+      const saved = localStorage.getItem('sdpo_ud_cases');
+      return saved ? JSON.parse(saved) : INITIAL_UD_CASES;
+    } catch {
+      return INITIAL_UD_CASES;
+    }
   });
 
   const [ios, setIos] = useState<InvestigatingOfficer[]>(() => {
-    const saved = localStorage.getItem('sdpo_ios');
-    return saved ? JSON.parse(saved) : INITIAL_IOS;
+    try {
+      const saved = localStorage.getItem('sdpo_ios');
+      return saved ? JSON.parse(saved) : INITIAL_IOS;
+    } catch {
+      return INITIAL_IOS;
+    }
   });
 
   const [dailyReports, setDailyReports] = useState<DailyCrimeReport[]>(() => {
-    const saved = localStorage.getItem('sdpo_daily_reports');
-    return saved ? JSON.parse(saved) : INITIAL_CRIME_REPORTS;
+    try {
+      const saved = localStorage.getItem('sdpo_daily_reports');
+      return saved ? JSON.parse(saved) : INITIAL_CRIME_REPORTS;
+    } catch {
+      return INITIAL_CRIME_REPORTS;
+    }
   });
 
   const [filters, setFilters] = useState<FilterOptions>(DEFAULT_FILTERS);
