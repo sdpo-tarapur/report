@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserAccount, UserRole, PoliceStationName, PermissionLevel } from '../types';
+import { isSupabaseConfigured } from '../lib/supabase';
 import {
   Shield,
   User,
@@ -17,6 +18,8 @@ import {
   Lock,
   ShieldCheck,
   ShieldAlert,
+  Database,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface UserManagementModalProps {
@@ -231,6 +234,18 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({
                     Individual Officer Access
                   </span>
                 )}
+
+                {/* Supabase status badge */}
+                <span
+                  className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border flex items-center gap-1 ${
+                    isSupabaseConfigured()
+                      ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700'
+                      : 'bg-amber-950/80 text-amber-300 border-amber-800'
+                  }`}
+                >
+                  <Database className="w-2.5 h-2.5" />
+                  {isSupabaseConfigured() ? 'Supabase Sync Active' : 'Local Storage Mode'}
+                </span>
               </div>
               <h2 className="text-lg font-black tracking-tight text-white mt-0.5">
                 User Credentials & Permission Level Management
