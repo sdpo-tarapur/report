@@ -38,6 +38,21 @@ export async function saveUserAccountToSupabase(account: UserAccount): Promise<b
   }
 }
 
+export async function deleteUserAccountFromSupabase(id: string): Promise<boolean> {
+  if (!isSupabaseConfigured() || !supabase) return false;
+  try {
+    const { error } = await supabase.from('user_accounts').delete().eq('id', id);
+    if (error) {
+      console.error('Error deleting user account from Supabase:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Supabase exception:', err);
+    return false;
+  }
+}
+
 // --- FIR CASES ---
 export async function fetchFIRCasesFromSupabase(): Promise<FIRCase[] | null> {
   if (!isSupabaseConfigured() || !supabase) return null;
