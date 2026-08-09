@@ -35,6 +35,19 @@ import { DailyCrimeReportSection } from './components/DailyCrimeReport';
 import { SupervisionStatusSection } from './components/SupervisionStatusSection';
 import { LoginModal } from './components/LoginModal';
 import { UserManagementModal } from './components/UserManagementModal';
+import { isSupabaseConfigured } from './lib/supabase';
+import {
+  fetchUserAccountsFromSupabase,
+  saveUserAccountToSupabase,
+  deleteUserAccountFromSupabase,
+  fetchFIRCasesFromSupabase,
+  saveFIRCaseToSupabase,
+  deleteFIRCaseFromSupabase,
+  fetchLandDisputesFromSupabase,
+  saveLandDisputeToSupabase,
+  fetchUDCasesFromSupabase,
+  saveUDCaseToSupabase,
+} from './services/supabaseService';
 
 const DEFAULT_FILTERS: FilterOptions = {
   searchQuery: '',
@@ -89,10 +102,9 @@ export default function App() {
         return JSON.parse(saved);
       }
     } catch {
-      // fallback below
+      // fallback
     }
-    // Default to initial SDPO account logged in on first launch
-    return INITIAL_USER_ACCOUNTS[0] || null;
+    return null;
   });
 
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
@@ -201,6 +213,36 @@ export default function App() {
     localStorage.setItem('sdpo_daily_reports', JSON.stringify(dailyReports));
   }, [dailyReports]);
 
+  // Supabase Initial Sync on Mount
+  useEffect(() => {
+    if (isSupabaseConfigured()) {
+      // Fetch User Accounts
+      fetchUserAccountsFromSupabase().then((accounts) => {
+        if (accounts && accounts.length > 0) {
+          setUserAccounts(accounts);
+        }
+      });
+      // Fetch FIR cases
+      fetchFIRCasesFromSupabase().then((firList) => {
+        if (firList && firList.length > 0) {
+          setCases(firList);
+        }
+      });
+      // Fetch Land disputes
+      fetchLandDisputesFromSupabase().then((landList) => {
+        if (landList && landList.length > 0) {
+          setLandDisputes(landList);
+        }
+      });
+      // Fetch UD cases
+      fetchUDCasesFromSupabase().then((udList) => {
+        if (udList && udList.length > 0) {
+          setUdCases(udList);
+        }
+      });
+    }
+  }, []);
+
   // Auth Handlers
   const handleLoginSuccess = (account: UserAccount) => {
     setCurrentUserAccount(account);
@@ -226,10 +268,12 @@ export default function App() {
       setCurrentUserAccount(updated);
       setCurrentRole(updated.role);
     }
+    saveUserAccountToSupabase(updated);
   };
 
   const handleAddUserAccount = (newAccount: UserAccount) => {
     setUserAccounts((prev) => [...prev, newAccount]);
+    saveUserAccountToSupabase(newAccount);
   };
 
   const handleDeleteUserAccount = (accountId: string) => {
@@ -238,6 +282,7 @@ export default function App() {
       return;
     }
     setUserAccounts((prev) => prev.filter((a) => a.id !== accountId));
+    deleteUserAccountFromSupabase(accountId);
   };
 
   const handleResetUserAccountsToDefaults = () => {
@@ -468,6 +513,16 @@ export default function App() {
     if (activePS && l.ps !== activePS) return false;
     return l.status === 'Pending';
   }).length;
+
+  if (!currentUserAccount) {
+    return (
+      <LoginModal
+        isOpen={true}
+        accounts={userAccounts}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased">
