@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserRole, UserAccount } from '../types';
 import { getRoleDisplayTitle } from '../utils/helpers';
+import { isSupabaseConfigured } from '../lib/supabase';
 import {
   Shield,
   ShieldCheck,
@@ -16,6 +17,8 @@ import {
   LogOut,
   User,
   Lock,
+  Database,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -87,6 +90,23 @@ export const Header: React.FC<HeaderProps> = ({
           {/* User Profile, User ID & Role Actions */}
           <div className="flex flex-wrap items-center gap-3 bg-slate-800/90 dark:bg-slate-900 p-2 rounded-xl border border-slate-700/80 shadow-xs">
             
+            {/* Supabase Status Pill */}
+            <div
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold flex items-center gap-1.5 border ${
+                isSupabaseConfigured()
+                  ? 'bg-emerald-950/70 text-emerald-300 border-emerald-800'
+                  : 'bg-amber-950/70 text-amber-300 border-amber-800'
+              }`}
+              title={
+                isSupabaseConfigured()
+                  ? 'Supabase Cloud Database connected and active'
+                  : 'Local Storage Mode. Add VITE_SUPABASE_URL to .env for Cloud Sync'
+              }
+            >
+              <Database className="w-3 h-3 shrink-0" />
+              <span>{isSupabaseConfigured() ? 'Supabase Connected' : 'Local Storage'}</span>
+            </div>
+
             {/* Authenticated Officer Info Badge */}
             {currentUserAccount ? (
               <div className="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700/90">
